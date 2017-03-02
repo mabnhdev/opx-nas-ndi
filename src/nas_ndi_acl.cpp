@@ -33,6 +33,16 @@
 #include <list>
 #include <inttypes.h>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define remove_acl_table delete_acl_table
+#define remove_acl_entry delete_acl_entry
+#define remove_acl_counter delete_acl_counter
+#endif
+
 static inline t_std_error _sai_to_ndi_err (sai_status_t st)
 {
     return ndi_utl_mk_std_err (e_std_err_ACL, st);

@@ -31,6 +31,13 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_QOS_MAP_PRIORITY_GROUP_TO_PFC_PRIORITY SAI_QOS_MAP_PFC_PRIORITY_TO_PRIORITY_GROUP
+#endif
 
 typedef std::unordered_map<ndi_qos_map_type_t, sai_qos_map_type_t, std::hash<int>> ndi_2_sai_qos_map_type_mapping;
 ndi_2_sai_qos_map_type_mapping    NDI_2_SAI_QOS_MAP_TYPE = {

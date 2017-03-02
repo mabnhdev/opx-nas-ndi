@@ -275,7 +275,12 @@ static t_std_error ndi_port_map_tbl_allocate(void) {
              return(STD_ERR(NPU, CFG, 0));
          }
         try {
+#ifdef ORIGINAL_DELL_CODE
             g_ndi_port_map_tbl[npu].resize(max_port);
+#else
+            /* Add one for the CPU port. Entry 0 is reserved for the CPU port. */
+            g_ndi_port_map_tbl[npu].resize(max_port+1);
+#endif
         } catch (...) {
             return ret_code;
         }
@@ -289,49 +294,93 @@ t_std_error ndi_port_map_sai_port_add(npu_id_t npu, sai_object_id_t sai_port, np
     uint32_t hwport_list[NDI_MAX_HWPORT_PER_PORT];
     uint32_t hwport_count = NDI_MAX_HWPORT_PER_PORT;
     t_std_error rc = STD_ERR_OK;
+#ifdef ORIGINAL_DELL_CODE
     uint32_t first_hwport = 0;
+#endif
     ndi_saiport_map_t sai_entry;
 
     if ((rc = ndi_sai_port_hwport_list_get(npu, sai_port, hwport_list, &hwport_count)) != STD_ERR_OK) {
         return(rc);
     }
+#ifdef ORIGINAL_DELL_CODE
     /*  use first HW port as index in the port map table */
     first_hwport = hwport_list[0];
+#else
+    /*
+     * Use first HW port as the basis for the index in the port map
+     * table. Entry 0 is reserved for the CPU port and the hwports can
+     * be 0 based (they are with the Cavium SAI) therefore form the
+     * npu_port index by adding one to the first HW port. This
+     * guarantees that entry 0 is available for the CPU port.
+     */
+    *npu_port = hwport_list[0] + 1;
+#endif
 
     std_rw_lock_write_guard l(&ndi_port_map_rwlock);
 
+#ifdef ORIGINAL_DELL_CODE
     if (first_hwport > g_ndi_port_map_tbl[npu].size()-1) {
+#else
+    if (*npu_port > g_ndi_port_map_tbl[npu].size()-1) {
+#endif
         try {
+#ifdef ORIGINAL_DELL_CODE
              g_ndi_port_map_tbl[npu].resize(first_hwport+1);
+#else
+             g_ndi_port_map_tbl[npu].resize(*npu_port+1);
+#endif
         } catch(...) {
             return(STD_ERR(NPU,NOMEM,0));
         }
     }
     /*  Check if the entry is already filled  */
+#ifdef ORIGINAL_DELL_CODE
     if (g_ndi_port_map_tbl[npu][first_hwport].flags & NDI_PORT_MAP_ACTIVE_MASK) {
+#else
+    if (g_ndi_port_map_tbl[npu][*npu_port].flags & NDI_PORT_MAP_ACTIVE_MASK) {
+#endif
         /* Entry already present  */
         return(STD_ERR(NPU,CFG,0));
     }
 
     /*  add the entry  */
+#ifdef ORIGINAL_DELL_CODE
     g_ndi_port_map_tbl[npu][first_hwport].sai_port = sai_port;
     g_ndi_port_map_tbl[npu][first_hwport].hwport_count = hwport_count;
     g_ndi_port_map_tbl[npu][first_hwport].flags |= NDI_PORT_MAP_ACTIVE_MASK;
     g_ndi_port_map_tbl[npu][first_hwport].hwport_list.resize(hwport_count);
+#else
+    g_ndi_port_map_tbl[npu][*npu_port].sai_port = sai_port;
+    g_ndi_port_map_tbl[npu][*npu_port].hwport_count = hwport_count;
+    g_ndi_port_map_tbl[npu][*npu_port].flags |= NDI_PORT_MAP_ACTIVE_MASK;
+    g_ndi_port_map_tbl[npu][*npu_port].hwport_list.resize(hwport_count);
+#endif
 
     for (uint32_t idx =0; idx < hwport_count; idx++) {
+#ifdef ORIGINAL_DELL_CODE
        g_ndi_port_map_tbl[npu][first_hwport].hwport_list[idx] = hwport_list[idx];
+#else
+       g_ndi_port_map_tbl[npu][*npu_port].hwport_list[idx] = hwport_list[idx];
+#endif
     }
 
     /*  Now add an entry in the sai port map   */
     sai_entry.npu_id = npu;
+#ifdef ORIGINAL_DELL_CODE
     sai_entry.npu_port = first_hwport;
+#else
+    sai_entry.npu_port = *npu_port;
+#endif
     if (ndi_saiport_map_add_entry(sai_port, &sai_entry) != true) {
         return STD_ERR(NPU, FAIL, 0);
     }
 
+#ifdef ORIGINAL_DELL_CODE
     NDI_PORT_LOG_TRACE(" Initializing ports hwport %X - sai port%" PRIx64 " ",first_hwport,sai_port);
     *npu_port = first_hwport;
+#else
+    NDI_PORT_LOG_TRACE(" Initializing ports npu_port %X - sai port%" PRIx64 " ",*npu_port,sai_port);
+#endif
     return(STD_ERR_OK);
 }
 
@@ -382,7 +431,9 @@ t_std_error ndi_sai_cpu_port_add(npu_id_t npu_id)
 t_std_error ndi_port_map_sai_port_delete(npu_id_t npu, sai_object_id_t sai_port, npu_port_t *npu_port)
 {
     t_std_error rc = STD_ERR_OK;
+#ifdef ORIGINAL_DELL_CODE
     uint32_t first_hwport = 0;
+#endif
 
     std_rw_lock_write_guard l(&ndi_port_map_rwlock);
 
@@ -403,22 +454,39 @@ t_std_error ndi_port_map_sai_port_delete(npu_id_t npu, sai_object_id_t sai_port,
     }
 
     npu = it->second.npu_id;
+#ifdef ORIGINAL_DELL_CODE
     first_hwport = it->second.npu_port;
+#else
+    *npu_port = it->second.npu_port;
+#endif
 
 
     /*  check if the the sai sai_port exist and flag is set to ACTIVE */
+#ifdef ORIGINAL_DELL_CODE
     if (( g_ndi_port_map_tbl[npu][first_hwport].sai_port != sai_port) ||
         ((g_ndi_port_map_tbl[npu][first_hwport].flags & NDI_PORT_MAP_ACTIVE_MASK) == false)) {
+#else
+    if (( g_ndi_port_map_tbl[npu][*npu_port].sai_port != sai_port) ||
+        ((g_ndi_port_map_tbl[npu][*npu_port].flags & NDI_PORT_MAP_ACTIVE_MASK) == false)) {
+#endif
         /*  it means the entry does not exist for the same hwport */
         NDI_PORT_LOG_TRACE("sai_port does not exist npu %d sai_port 0x%" PRIx64 " ", npu, sai_port);
         return STD_ERR(NPU, FAIL, 0);
     }
 
+#ifdef ORIGINAL_DELL_CODE
     g_ndi_port_map_tbl[npu][first_hwport].hwport_list.resize(0);
     g_ndi_port_map_tbl[npu][first_hwport].flags &= ~NDI_PORT_MAP_ACTIVE_MASK;
     g_ndi_port_map_tbl[npu][first_hwport].hwport_count = 0;
+#else
+    g_ndi_port_map_tbl[npu][*npu_port].hwport_list.resize(0);
+    g_ndi_port_map_tbl[npu][*npu_port].flags &= ~NDI_PORT_MAP_ACTIVE_MASK;
+    g_ndi_port_map_tbl[npu][*npu_port].hwport_count = 0;
+#endif
 
+#ifdef ORIGINAL_DELL_CODE
     *npu_port = first_hwport;
+#endif
     /*  Now delete from saiport map table  */
     try {
         g_saiport_map.erase(sai_port);
@@ -447,11 +515,32 @@ static t_std_error ndi_per_npu_sai_port_map_update(npu_id_t npu_id)
     size_t port_count = 0;
     uint_t p_idx =0;
     npu_port_t npu_port = 0;
+#ifndef ORIGINAL_DELL_CODE
+    sai_attribute_t sai_attr;
+    sai_status_t sai_ret;
+#endif
 
+#ifdef ORIGINAL_DELL_CODE
     /*  Get the list of sai ports */
 
     port_count = ndi_max_npu_port_get(npu_id);
+#else
+    nas_ndi_db_t  *ndi_db_ptr = ndi_db_ptr_get(npu_id);
+    if (ndi_db_ptr == NULL) {
+        return (STD_ERR(NPU, PARAM, 0));
+    }
 
+    /*
+     * Get the number of ports from the SAI. This will not include the CPU port.
+     */
+    sai_attr.id = SAI_SWITCH_ATTR_PORT_NUMBER;
+    if ((sai_ret = ndi_sai_switch_api_tbl_get(ndi_db_ptr)->get_switch_attribute(1, &sai_attr))
+                         != SAI_STATUS_SUCCESS) {
+        NDI_PORT_LOG_ERROR("SAI SWITCH API Failure API ID %d, Error %d ",  sai_attr.id, sai_ret);
+        return (STD_ERR(NPU, CFG, sai_ret));
+    }
+    port_count = sai_attr.value.u32;
+#endif
     sai_port_list = (sai_object_id_t *)calloc(port_count, sizeof(sai_object_id_t));
     if (sai_port_list == NULL) {
         return(STD_ERR(NPU, NOMEM, 0));

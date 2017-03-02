@@ -304,6 +304,15 @@ t_std_error ndi_port_loopback_set(npu_id_t npu_id, npu_port_t port_id, BASE_CMN_
     return _sai_port_attr_set_or_get(npu_id,port_id,SAI_SG_ACT_SET,&sai_attr,1);
 }
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme Change - The Broadcom SAI doesn't currently support the 100Gb/s
+ * media types so for now map them to the 40Gb/s media types.
+ */
+#define SAI_PORT_MEDIA_TYPE_QSFP28_FIBER SAI_PORT_MEDIA_TYPE_QSFP_FIBER
+#define SAI_PORT_MEDIA_TYPE_QSFP28_COPPER SAI_PORT_MEDIA_TYPE_QSFP_COPPER
+#endif
+
 static inline sai_port_media_type_t ndi_sai_port_media_type_translate (PLATFORM_MEDIA_TYPE_t hal_media_type)
 {
     sai_port_media_type_t sal_media_type;

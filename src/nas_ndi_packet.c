@@ -34,6 +34,15 @@
 
 #define NDI_MAX_PKT_ATTR  3
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_HOSTIF_TRAP_TYPE_SAMPLEPACKET SAI_HOSTIF_TRAP_ID_SAMPLEPACKET
+#define SAI_HOSTIF_TRAP_TYPE_L3_MTU_ERROR SAI_HOSTIF_TRAP_ID_L3_MTU_ERROR
+#endif
+
 static inline  sai_switch_api_t *ndi_packet_switch_api_tbl_get(nas_ndi_db_t *ndi_db_ptr)
 {
     return(ndi_db_ptr->ndi_sai_api_tbl.n_sai_switch_api_tbl);

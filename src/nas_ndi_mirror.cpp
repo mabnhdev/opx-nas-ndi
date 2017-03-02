@@ -38,6 +38,14 @@
 #include <inttypes.h>
 #include <algorithm>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_ERSPAN_ENCAPSULATION_TYPE_MIRROR_L3_GRE_TUNNEL SAI_MIRROR_L3_GRE_TUNNEL
+#endif
+
 #define MAX_MIRROR_SAI_ATTR 15
 
 #define NDI_MIRROR_LOG(type,lvl, msg, ...)\

@@ -22,6 +22,21 @@
 #include<unordered_map>
 #include <algorithm>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_PORT_FDB_LEARNING_MODE_DROP SAI_PORT_LEARN_MODE_DROP
+#define SAI_PORT_FDB_LEARNING_MODE_DISABLE SAI_PORT_LEARN_MODE_DISABLE
+#define SAI_PORT_FDB_LEARNING_MODE_HW SAI_PORT_LEARN_MODE_HW
+#define SAI_PORT_FDB_LEARNING_MODE_CPU_TRAP SAI_PORT_LEARN_MODE_CPU_TRAP
+#define SAI_PORT_FDB_LEARNING_MODE_CPU_LOG SAI_PORT_LEARN_MODE_CPU_LOG
+#define SAI_PORT_INTERNAL_LOOPBACK_MODE_NONE SAI_PORT_INTERNAL_LOOPBACK_NONE
+#define SAI_PORT_INTERNAL_LOOPBACK_MODE_PHY SAI_PORT_INTERNAL_LOOPBACK_PHY
+#define SAI_PORT_INTERNAL_LOOPBACK_MODE_MAC SAI_PORT_INTERNAL_LOOPBACK_MAC
+#endif
+
 static std::unordered_map<BASE_IF_PHY_MAC_LEARN_MODE_t, sai_port_fdb_learning_mode_t,std::hash<int>>
 ndi_to_sai_fdb_learn_mode =
 {

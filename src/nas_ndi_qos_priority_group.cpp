@@ -31,6 +31,14 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define sai_ingress_priority_group_stat_t sai_ingress_priority_group_stat_counter_t
+#endif
+
 
 const static std::unordered_map<nas_attr_id_t, sai_attr_id_t, std::hash<int>>
     ndi2sai_priority_group_attr_id_map = {

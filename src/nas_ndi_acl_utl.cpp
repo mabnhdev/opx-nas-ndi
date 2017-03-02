@@ -27,12 +27,22 @@
 #include "nas_ndi_event_logs.h"
 #include "nas_ndi_acl.h"
 #include "nas_ndi_acl_utl.h"
+#ifdef ORIGINAL_DELL_CODE
 #include "sai_acl_utils.h"
+#endif
 #include <vector>
 #include <unordered_map>
 #include <string.h>
 #include <list>
 #include <netinet/in.h>
+
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_ACL_ENTRY_ATTR_ACTION_PACKET_ACTION SAI_ACL_ENTRY_ATTR_PACKET_ACTION
+#endif
 
 static std_mutex_lock_create_static_init_rec(table_lock);
 

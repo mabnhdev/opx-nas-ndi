@@ -32,6 +32,13 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define sai_queue_stat_t sai_queue_stat_counter_t
+#endif
 
 /**
  * This function set queue attribute
@@ -301,10 +308,12 @@ static const std::unordered_map<BASE_QOS_QUEUE_STAT_t, sai_queue_stat_t, std::ha
         {BASE_QOS_QUEUE_STAT_RED_DISCARD_DROPPED_BYTES, SAI_QUEUE_STAT_RED_DISCARD_DROPPED_BYTES},
         {BASE_QOS_QUEUE_STAT_DISCARD_DROPPED_PACKETS, SAI_QUEUE_STAT_DISCARD_DROPPED_PACKETS},
         {BASE_QOS_QUEUE_STAT_DISCARD_DROPPED_BYTES, SAI_QUEUE_STAT_DISCARD_DROPPED_BYTES},
+#ifndef USING_BROADCOM_SAI
         {BASE_QOS_QUEUE_STAT_CURRENT_OCCUPANCY_BYTES, SAI_QUEUE_STAT_CURR_OCCUPANCY_BYTES},
         {BASE_QOS_QUEUE_STAT_WATERMARK_BYTES, SAI_QUEUE_STAT_WATERMARK_BYTES},
         {BASE_QOS_QUEUE_STAT_SHARED_CURRENT_OCCUPANCY_BYTES, SAI_QUEUE_STAT_SHARED_CURR_OCCUPANCY_BYTES},
         {BASE_QOS_QUEUE_STAT_SHARED_WATERMARK_BYTES, SAI_QUEUE_STAT_SHARED_WATERMARK_BYTES},
+#endif
     };
 
 static void _fill_counter_stat_by_type(sai_queue_stat_t type, uint64_t val,
@@ -383,6 +392,7 @@ static void _fill_counter_stat_by_type(sai_queue_stat_t type, uint64_t val,
     case SAI_QUEUE_STAT_DISCARD_DROPPED_BYTES:
         stat->discard_dropped_bytes = val;
         break;
+#ifndef USING_BROADCOM_SAI
     case SAI_QUEUE_STAT_CURR_OCCUPANCY_BYTES:
         stat->current_occupancy_bytes = val;
         break;
@@ -395,6 +405,7 @@ static void _fill_counter_stat_by_type(sai_queue_stat_t type, uint64_t val,
     case SAI_QUEUE_STAT_SHARED_WATERMARK_BYTES:
         stat->shared_watermark_bytes = val;
         break;
+#endif
     default:
         break;
     }

@@ -32,6 +32,16 @@
 #include <unordered_map>
 
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_SCHEDULING_TYPE_STRICT SAI_SCHEDULING_STRICT
+#define SAI_SCHEDULING_TYPE_WRR SAI_SCHEDULING_WRR
+#define SAI_SCHEDULING_TYPE_DWRR SAI_SCHEDULING_DWRR
+#endif
+
 static t_std_error ndi_qos_fill_scheduler_attr(nas_attr_id_t attr_id,
                         const qos_scheduler_struct_t *p,
                         sai_attribute_t &sai_attr)

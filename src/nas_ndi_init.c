@@ -29,6 +29,9 @@
 #include "nas_ndi_mac_utl.h"
 #include "nas_ndi_int.h"
 #include "nas_ndi_utils.h"
+#ifndef ORIGINAL_DELL_CODE
+#include "nas_switch.h"
+#endif
 #include "sai.h"
 #include "saistatus.h"
 #include "saitypes.h"
@@ -42,6 +45,53 @@
 #include<unistd.h>
 #include <inttypes.h>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_FDB_ENTRY_TYPE_STATIC SAI_FDB_ENTRY_STATIC
+#define SAI_VLAN_TAGGING_MODE_TAGGED SAI_VLAN_PORT_TAGGED
+#define SAI_VLAN_TAGGING_MODE_UNTAGGED SAI_VLAN_PORT_UNTAGGED
+
+/**
+ *   Port/vlan membership structure.
+ *
+ *   This structure used to be part of the SAI interface but no longer is.
+ *
+ *   This structure is also defined in nas_ndi_vlan.c. The definitions
+ *   must be kept identical.
+ */
+typedef struct _sai_vlan_port_t
+{
+    sai_object_id_t port_id;
+    sai_vlan_tagging_mode_t tagging_mode;
+    sai_object_id_t vlan_member_id;
+} sai_vlan_port_t;
+
+/**
+ * Routine Description:
+ *    @brief Add or DeletePort to/from VLAN. This routine is an extension
+ *     to the Broadcom SAI  to mimic the behaviour of the eqivalent
+ *     routine in the OpenSwitch SAI.
+ *
+ * Arguments:
+ *    @param[in] add_to_vlan - if true add port, if false remove port
+ *    @param[in] npu_id - NPU id
+ *    @param[in] vlan_id - VLAN id
+ *    @param[in] port_count - number of ports
+ *    @param[in] port_list - pointer to membership structures
+ *
+ * Return Values:
+ *    @return SAI_STATUS_SUCCESS on success
+ *            Failure status code on error
+ */
+sai_status_t ndi_sai_add_or_del_ports_to_vlan(_In_ bool add_to_vlan,
+                                              _In_ npu_id_t npu_id,
+                                              _In_ sai_vlan_id_t vlan_id,
+                                              _In_ uint32_t port_count,
+                                              _In_ sai_vlan_port_t *port_list);
+#endif
 
 typedef enum {
     ndi_internal_event_T_SWITCH_OPER,
@@ -94,8 +144,18 @@ static int ndi_profile_get_next_value(sai_switch_profile_id_t profile_id,
 {
     /*  @todo TODO implement this later */
     NDI_INIT_LOG_TRACE("get next key-value pair\n");
+#ifdef ORIGINAL_DELL_CODE
     *variable = NULL;
-    *value = NULL;
+#else
+    if ((variable !=NULL) && (*variable != NULL)) {
+        /*
+         * Extreme change - return "" instead of NULL to prevent
+         * Broadcom SAI from SEGVing.
+         */
+        *variable = "";
+        *value = "";
+    }
+#endif
     return -1; /*  return -1 for end of the list */
 }
 
@@ -198,18 +258,30 @@ static t_std_error nas_ndi_sai_api_table_init(ndi_sai_api_tbl_t *n_sai_api_tbl)
         if (sai_ret != SAI_STATUS_SUCCESS) {
             break;
         }
+        /*
+         * Extreme change - The Broadcom SAI doesn't implement the STP
+         * API yet.
+         */
+#ifndef USING_BROADCOM_SAI
         sai_ret = sai_api_query(SAI_API_STP, (void *)&(n_sai_api_tbl->n_sai_stp_api_tbl));
         if (sai_ret != SAI_STATUS_SUCCESS) {
             break;
         }
+#endif
         sai_ret = sai_api_query(SAI_API_MIRROR, (void *)&(n_sai_api_tbl->n_sai_mirror_api_tbl));
         if (sai_ret != SAI_STATUS_SUCCESS) {
             break;
         }
+        /*
+         * Extreme change - The Broadcom SAI doesn't implement the
+         * SAMPLEPACKET API yet.
+         */
+#ifndef USING_BROADCOM_SAI
         sai_ret = sai_api_query(SAI_API_SAMPLEPACKET, (void *)&(n_sai_api_tbl->n_sai_samplepacket_api_tbl));
         if (sai_ret != SAI_STATUS_SUCCESS) {
             break;
         }
+#endif
         sai_ret = sai_api_query(SAI_API_HOST_INTERFACE, (void *)&(n_sai_api_tbl->n_sai_hostif_api_tbl));
         if (sai_ret != SAI_STATUS_SUCCESS) {
             break;
@@ -438,9 +510,14 @@ static t_std_error ndi_delete_port_default_vlan(npu_id_t npu_id, sai_object_id_t
     EV_LOG_INFO(ev_log_t_NDI, ev_log_s_MAJOR, "NDI_VLAN",
                 "Deleting port %d from system default vlan %d", sai_port, vlan_id);
 
+#ifndef USING_BROADCOM_SAI
     if ((sai_ret = ndi_db_ptr->ndi_sai_api_tbl.n_sai_vlan_api_tbl->remove_ports_from_vlan(vlan_id,
                                                 port_count, &vlan_port))
             != SAI_STATUS_SUCCESS) {
+#else
+    if ((sai_ret = ndi_sai_add_or_del_ports_to_vlan(false, npu_id, vlan_id, port_count, &vlan_port))
+        != SAI_STATUS_SUCCESS) {
+#endif
         return STD_ERR(INTERFACE, CFG, sai_ret);
     }
     return STD_ERR_OK;
@@ -580,10 +657,26 @@ t_std_error ndi_initialize_switch(nas_ndi_db_t *ndi_db_ptr)
         switch_notification.on_packet_event =
                                          ndi_packet_rx_cb;
     }
+
+#ifndef ORIGINAL_DELL_CODE
+    nas_switch_id_t switch_id;
+    nas_switch_detail_t *switch_detail;
+    if (!nas_find_switch_id_by_npu(ndi_db_ptr->npu_profile_id, &switch_id)) {
+        NDI_INIT_LOG_ERROR("Failed to find switch");
+        return STD_ERR(NPU,FAIL,0);
+    }
+    switch_detail = nas_switch(switch_id);
+#endif
+
     /*  initialize the NPU */
 
+#ifdef ORIGINAL_DELL_CODE
     sai_ret = sai_switch_api_tbl->initialize_switch(ndi_db_ptr->npu_profile_id, NULL,
                                                     NULL, &switch_notification);
+#else
+    sai_ret = sai_switch_api_tbl->initialize_switch(ndi_db_ptr->npu_profile_id, switch_detail->hardware_id,
+                                                    NULL, &switch_notification);
+#endif
 
     if (sai_ret != SAI_STATUS_SUCCESS) {
         return (STD_ERR(NPU, CFG, sai_ret));

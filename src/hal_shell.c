@@ -20,16 +20,28 @@
  */
 
 #include "hal_shell.h"
+#ifndef USING_BROADCOM_SAI
 #include "sai_shell.h"
 
 bool hal_shell_cmd_add_flexable(void * param, hal_shell_check_run_function fun) {
     return sai_shell_cmd_add_flexible(param,(sai_shell_check_run_function)fun);
 }
+#endif
 
 bool hal_shell_cmd_add(const char *name,hal_shell_function fun,const char *description) {
+#ifndef USING_BROADCOM_SAI
     return sai_shell_cmd_add(name,(sai_shell_function)fun,description);
+#else
+    /*
+     * Extreme change - get rid of dependency on Dell's sai-common
+     * layer for now.
+     */
+    return false;
+#endif
 }
 
+#ifndef USING_BROADCOM_SAI
 void hal_shell_run_command(const char *str) {
     sai_shell_run_command(str);
 }
+#endif

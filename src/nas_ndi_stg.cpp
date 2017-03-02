@@ -38,6 +38,14 @@
 #include <inttypes.h>
 #include <vector>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define sai_port_stp_state_t sai_port_stp_port_state_t
+#endif
+
 #define NDI_STG_LOG(type,LVL,msg, ...) \
         EV_LOG( type, NAS_L2, LVL,"NDI-STG", msg, ##__VA_ARGS__)
 

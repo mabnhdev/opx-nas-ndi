@@ -27,7 +27,9 @@
 
 #include "sai.h"
 #include "saiswitch.h"
+#ifdef ORIGINAL_DELL_CODE
 #include "sai_infra_api.h"
+#endif
 #include "saihash.h"
 
 #include <stdio.h>

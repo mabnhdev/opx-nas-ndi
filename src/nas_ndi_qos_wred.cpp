@@ -47,7 +47,11 @@ const static std::unordered_map<nas_attr_id_t, sai_attr_id_t, std::hash<int>>
     {BASE_QOS_WRED_PROFILE_RED_MAX_THRESHOLD,       SAI_WRED_ATTR_RED_MAX_THRESHOLD},
     {BASE_QOS_WRED_PROFILE_RED_DROP_PROBABILITY,    SAI_WRED_ATTR_RED_DROP_PROBABILITY},
     {BASE_QOS_WRED_PROFILE_WEIGHT,        SAI_WRED_ATTR_WEIGHT},
+#ifndef USING_BROADCOM_SAI
     {BASE_QOS_WRED_PROFILE_ECN_ENABLE,    SAI_WRED_ATTR_ECN_MARK_ENABLE},
+#else
+    {BASE_QOS_WRED_PROFILE_ECN_ENABLE,    SAI_WRED_ATTR_ECN_MARK_MODE},
+#endif
 };
 
 
@@ -262,8 +266,13 @@ static t_std_error _fill_ndi_qos_wred_profile_struct(sai_attribute_t *attr_list,
             p->r_drop_prob = attr->value.u8;
         else if (attr->id == SAI_WRED_ATTR_WEIGHT)
             p->weight = attr->value.u8;
+#ifndef USING_BROADCOM_SAI
         else if (attr->id == SAI_WRED_ATTR_ECN_MARK_ENABLE)
             p->ecn_enable = attr->value.booldata;
+#else
+        else if (attr->id == SAI_WRED_ATTR_ECN_MARK_MODE)
+            p->ecn_enable = attr->value.s32 != SAI_ECN_MARK_MODE_NONE;
+#endif
     }
 
     return STD_ERR_OK;

@@ -31,6 +31,15 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_BUFFER_PROFILE_THRESHOLD_MODE_STATIC SAI_BUFFER_THRESHOLD_MODE_STATIC
+#define SAI_BUFFER_PROFILE_THRESHOLD_MODE_DYNAMIC SAI_BUFFER_THRESHOLD_MODE_DYNAMIC
+#endif
+
 
 const static std::unordered_map<nas_attr_id_t, sai_attr_id_t, std::hash<int>>
     ndi2sai_buffer_profile_attr_id_map = {

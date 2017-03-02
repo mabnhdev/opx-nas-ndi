@@ -33,6 +33,17 @@
 
 #define MAC_STR_LEN 20
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_FDB_ENTRY_TYPE_STATIC SAI_FDB_ENTRY_STATIC
+#define SAI_FDB_ENTRY_TYPE_DYNAMIC SAI_FDB_ENTRY_DYNAMIC
+#define SAI_FDB_FLUSH_ENTRY_TYPE_STATIC SAI_FDB_FLUSH_ENTRY_STATIC
+#define SAI_FDB_FLUSH_ENTRY_TYPE_DYNAMIC SAI_FDB_FLUSH_ENTRY_DYNAMIC
+#endif
+
 static inline t_std_error sai_to_ndi_err_translate (sai_status_t sai_err)
 {
     return ndi_utl_mk_std_err(e_std_err_MAC, sai_err);

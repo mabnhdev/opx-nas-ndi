@@ -32,6 +32,17 @@
 #include <vector>
 #include <unordered_map>
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define SAI_PORT_FLOW_CONTROL_MODE_DISABLE SAI_PORT_FLOW_CONTROL_DISABLE
+#define SAI_PORT_FLOW_CONTROL_MODE_TX_ONLY SAI_PORT_FLOW_CONTROL_TX_ONLY
+#define SAI_PORT_FLOW_CONTROL_MODE_RX_ONLY SAI_PORT_FLOW_CONTROL_RX_ONLY
+#define SAI_PORT_FLOW_CONTROL_MODE_BOTH_ENABLE SAI_PORT_FLOW_CONTROL_BOTH_ENABLE
+#define SAI_PORT_ATTR_QOS_PRIORITY_GROUP_TO_PFC_PRIORITY_MAP SAI_PORT_ATTR_QOS_PFC_PRIORITY_TO_PRIORITY_GROUP_MAP
+#endif
 
 static std::unordered_map<BASE_QOS_FLOW_CONTROL_t, sai_port_flow_control_mode_t, std::hash<int>> \
     ndi2sai_flow_control_map = {

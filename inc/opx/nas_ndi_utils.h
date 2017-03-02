@@ -50,6 +50,15 @@ t_std_error ndi_sai_vlan_id_get(npu_id_t npu_id, hal_vlan_id_t vlan_id, sai_vlan
 
 ndi_switch_oper_status_t ndi_oper_status_translate(sai_switch_oper_status_t oper_status);
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define sai_port_stat_t sai_port_stat_counter_t
+#define sai_vlan_stat_t sai_vlan_stat_counter_t
+#endif
+
 bool ndi_to_sai_if_stats(ndi_stat_id_t ndi_id, sai_port_stat_t * sai_id);
 
 bool ndi_to_sai_vlan_stats(ndi_stat_id_t ndi_id, sai_vlan_stat_t * sai_id);

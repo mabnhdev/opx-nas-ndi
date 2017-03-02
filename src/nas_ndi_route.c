@@ -32,6 +32,20 @@
 #include "saistatus.h"
 #include "saitypes.h"
 
+#ifdef USING_BROADCOM_SAI
+/*
+ * Extreme change - redefine names so that they match the names
+ * defined by the Broadcom SAI.
+ */
+#define sai_route_entry_t sai_unicast_route_entry_t
+#define SAI_ROUTE_ENTRY_ATTR_PACKET_ACTION SAI_ROUTE_ATTR_PACKET_ACTION
+#define SAI_ROUTE_ENTRY_ATTR_NEXT_HOP_ID SAI_ROUTE_ATTR_NEXT_HOP_ID
+#define SAI_ROUTE_ENTRY_ATTR_TRAP_PRIORITY SAI_ROUTE_ATTR_TRAP_PRIORITY
+#define SAI_NEIGHBOR_ENTRY_ATTR_DST_MAC_ADDRESS SAI_NEIGHBOR_ATTR_DST_MAC_ADDRESS
+#define SAI_NEIGHBOR_ENTRY_ATTR_PACKET_ACTION SAI_NEIGHBOR_ATTR_PACKET_ACTION
+#define SAI_NEXT_HOP_TYPE_IP SAI_NEXT_HOP_IP
+#define SAI_NEXT_HOP_GROUP_TYPE_ECMP SAI_NEXT_HOP_GROUP_ECMP
+#endif
 
 /*  NDI Route/Neighbor specific APIs  */
 
