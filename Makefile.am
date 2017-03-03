@@ -19,6 +19,12 @@ libopx_nas_ndi_la_SOURCES= src/hal_shell.c src/nas_ndi_init.c src/nas_ndi_utils.
 
 libopx_nas_ndi_la_CPPFLAGS= -D_FILE_OFFSET_BITS=64 -I$(top_srcdir)/inc/opx -I$(includedir)/opx
 
+# The X870 version of the NDI uses the Broadcom SAI therefore the sources need to know this because
+# the Broadcom SAI headers are incompatible with the ones provided by OpenSwitch.
+if USING_BROADCOM_SAI
+libopx_nas_ndi_la_CPPFLAGS+= -DUSING_BROADCOM_SAI
+endif
+
 libopx_nas_ndi_la_CXXFLAGS=-std=c++11
 
 libopx_nas_ndi_la_LDFLAGS=-shared -version-info 1:1:0
