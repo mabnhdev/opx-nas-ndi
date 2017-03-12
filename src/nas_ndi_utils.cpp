@@ -202,7 +202,7 @@ t_std_error ndi_sai_vlan_id_get(npu_id_t npu_id, hal_vlan_id_t vlan_id, sai_vlan
 
 bool ndi_port_to_sai_oid(ndi_port_t * ndi_port, sai_object_id_t *oid){
     if(ndi_sai_port_id_get( ndi_port->npu_id,ndi_port->npu_port,oid)!= STD_ERR_OK){
-        NDI_LOG_ERROR(0,"NAS-NDI-UTILS","Failed to get oid for npu %d and port %d",
+        NDI_LOG_ERROR("NAS-NDI-UTILS","Failed to get oid for npu %d and port %d",
                               ndi_port->npu_id,ndi_port->npu_port);
         return false;
     }
@@ -213,7 +213,7 @@ bool ndi_port_to_sai_oid(ndi_port_t * ndi_port, sai_object_id_t *oid){
 bool ndi_to_sai_if_stats(ndi_stat_id_t ndi_id, sai_port_stat_t * sai_id){
     auto it = ndi_to_sai_if_stat_ids.find(ndi_id);
     if(it == ndi_to_sai_if_stat_ids.end() || (sai_id == NULL)){
-        NDI_LOG_ERROR(0,"NAS-NDI-UTILS","Failed to get the sai stat id for ndi id %d ",ndi_id);
+        NDI_LOG_ERROR("NAS-NDI-UTILS","Failed to get the sai stat id for ndi id %d ",ndi_id);
         return false;
     }
     *sai_id = it->second;
@@ -223,7 +223,7 @@ bool ndi_to_sai_if_stats(ndi_stat_id_t ndi_id, sai_port_stat_t * sai_id){
 bool ndi_to_sai_vlan_stats(ndi_stat_id_t ndi_id, sai_vlan_stat_t * sai_id){
     auto it = ndi_to_sai_vlan_stat_ids.find(ndi_id);
     if(it == ndi_to_sai_vlan_stat_ids.end() || (sai_id == NULL)){
-        NDI_LOG_ERROR(0,"NAS-NDI-UTILS","Failed to get the sai stat id for ndi id %d",ndi_id);
+        NDI_LOG_ERROR("NAS-NDI-UTILS","Failed to get the sai stat id for ndi id %d",ndi_id);
         return false;
     }
     *sai_id = it->second;

@@ -74,7 +74,7 @@ t_std_error ndi_rif_create (ndi_rif_entry_t *rif_entry, ndi_rif_id_t *rif_id)
                 if ((rc = ndi_sai_port_id_get(rif_entry->attachment.port_id.npu_id,
                                                     rif_entry->attachment.port_id.npu_port,
                                                     &sai_port)) != STD_ERR_OK) {
-                NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "SAI port id get "
+                NDI_LOG_TRACE("NDI-ROUTE-RIF", "SAI port id get "
                               "failed for NPU-id:%d NPU-port:%d",
                               rif_entry->attachment.port_id.npu_id,
                               rif_entry->attachment.port_id.npu_port);
@@ -98,7 +98,7 @@ t_std_error ndi_rif_create (ndi_rif_entry_t *rif_entry, ndi_rif_id_t *rif_id)
             attr_idx++;
             break;
         default:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "Invalid attribute");
+            NDI_LOG_TRACE("NDI-ROUTE-RIF", "Invalid attribute");
             return STD_ERR(ROUTE, FAIL, 0);
     }
 
@@ -176,7 +176,7 @@ t_std_error ndi_rif_set_attribute (ndi_rif_entry_t *rif_entry)
             if ((rc = ndi_sai_port_id_get(rif_entry->attachment.port_id.npu_id,
                                                 rif_entry->attachment.port_id.npu_port,
                                                 &sai_port)) != STD_ERR_OK) {
-                NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "SAI port id get "
+                NDI_LOG_TRACE("NDI-ROUTE-RIF", "SAI port id get "
                               "failed for NPU-id:%d NPU-port:%d",
                               rif_entry->attachment.port_id.npu_id,
                               rif_entry->attachment.port_id.npu_port);
@@ -213,7 +213,7 @@ t_std_error ndi_rif_set_attribute (ndi_rif_entry_t *rif_entry)
             break;
 
         default:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "Invalid attribute");
+            NDI_LOG_TRACE("NDI-ROUTE-RIF", "Invalid attribute");
             return STD_ERR(ROUTE, FAIL, 0);
     }
 
@@ -276,7 +276,7 @@ t_std_error ndi_rif_get_attribute (ndi_rif_entry_t *rif_entry)
                  rif_entry->mtu = sai_attr[attr_idx].value.u32;
                  break;
             default:
-                NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "Invalid get attribute");
+                NDI_LOG_TRACE("NDI-ROUTE-RIF", "Invalid get attribute");
                 return STD_ERR(ROUTE, FAIL, 0);
         }
     }
@@ -390,7 +390,7 @@ t_std_error ndi_route_vr_set_attribute (ndi_vr_entry_t *vr_entry)
             break;
 
         default:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "Invalid attribute");
+            NDI_LOG_TRACE("NDI-ROUTE-RIF", "Invalid attribute");
             return STD_ERR(ROUTE, FAIL, 0);
     }
 
@@ -438,7 +438,7 @@ t_std_error ndi_route_vr_get_attribute (ndi_vr_entry_t *vr_entry)
                  vr_entry->violation_ip_options = sai_attr[attr_idx].value.s32;
                  break;
             default:
-                 NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-RIF", "Invalid get attribute");
+                 NDI_LOG_TRACE("NDI-ROUTE-RIF", "Invalid get attribute");
                  return STD_ERR(ROUTE, FAIL, 0);
         }
     }

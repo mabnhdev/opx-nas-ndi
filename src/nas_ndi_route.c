@@ -207,7 +207,7 @@ t_std_error ndi_route_set_attribute (ndi_route_t *p_route_entry)
             sai_attr.id = SAI_ROUTE_ENTRY_ATTR_NEXT_HOP_ID;
             break;
         default:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE", "Invalid attribute");
+            NDI_LOG_TRACE("NDI-ROUTE", "Invalid attribute");
             return STD_ERR(ROUTE, FAIL, 0);
     }
 
@@ -403,16 +403,16 @@ t_std_error ndi_route_set_next_hop_group_attribute (ndi_nh_group_t *p_nh_group_e
 
     switch(p_nh_group_entry->flags) {
         case NDI_ROUTE_NH_GROUP_ATTR_TYPE:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
-                                                    "Invalid attribute: Create-only");
+            NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
+                          "Invalid attribute: Create-only");
             return STD_ERR(ROUTE, FAIL, sai_ret);
         case NDI_ROUTE_NH_GROUP_ATTR_NEXT_HOP_LIST:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
-                           "Invalid attribute: Create-only");
+            NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
+                          "Invalid attribute: Create-only");
             return STD_ERR(ROUTE, FAIL, sai_ret);
         default:
-            NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
-                                        "Invalid attribute");
+            NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
+                          "Invalid attribute");
             break;
     }
     sai_nh_group_id  = nh_group_handle;
@@ -441,7 +441,7 @@ t_std_error ndi_route_get_next_hop_group_attribute (ndi_nh_group_t *p_nh_group_e
     if ((sai_ret = ndi_next_hop_group_api_get(ndi_db_ptr)->
             get_next_hop_group_attribute(sai_nh_group_id,attr_count, sai_attr))
             != SAI_STATUS_SUCCESS) {
-        NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
+        NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
                       "get attribute failed");
         return STD_ERR(ROUTE, FAIL, sai_ret);
     }
@@ -463,8 +463,8 @@ t_std_error ndi_route_get_next_hop_group_attribute (ndi_nh_group_t *p_nh_group_e
                  */
                 nhop_count = sai_attr[attr_idx].value.objlist.count;
                 if (nhop_count == 0) {
-                    NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
-                                 "Invalid get nhlist attribute");
+                    NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
+                                  "Invalid get nhlist attribute");
                     return STD_ERR(ROUTE, FAIL, sai_ret);
                 }
 
@@ -480,8 +480,8 @@ t_std_error ndi_route_get_next_hop_group_attribute (ndi_nh_group_t *p_nh_group_e
 
                 break;
             default:
-                NDI_LOG_TRACE(ev_log_t_NDI, "NDI-ROUTE-NHGROUP",
-                             "Invalid get attribute");
+                NDI_LOG_TRACE("NDI-ROUTE-NHGROUP",
+                              "Invalid get attribute");
                 return STD_ERR(ROUTE, FAIL, 0);
         }
     }

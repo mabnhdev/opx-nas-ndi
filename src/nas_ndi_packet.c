@@ -142,7 +142,7 @@ void ndi_packet_rx_cb(const void *buffer, sai_size_t buffer_size, uint32_t attr_
     STD_ASSERT(buffer != NULL);
 
     if(attr_count == 0) {
-        NDI_LOG_TRACE(ev_log_t_NDI, "NDI-PKT", "Attribute count is 0");
+        NDI_LOG_TRACE("NDI-PKT", "Attribute count is 0");
         return;
     }
 
