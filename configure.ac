@@ -29,9 +29,5 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_CHECK_FUNCS([memset])
 
-# If this directory ends in "x870" define the automake variable USING_BROADCOM_SAI so that the
-# the sources can be compiled knowing that they are using the BROADCOM SAI.
-AM_CONDITIONAL([USING_BROADCOM_SAI], [test ${abs_srcdir%x870} != ${abs_srcdir}])
-
 AC_CONFIG_FILES([Makefile inc/Makefile])
 AC_OUTPUT
