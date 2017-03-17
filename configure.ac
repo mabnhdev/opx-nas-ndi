@@ -29,11 +29,9 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_CHECK_FUNCS([memset])
 
-# If this directory contains the string "x870" define the automake variable
-# USING_BROADCOM_SAI so that the the sources can be compiled knowing that they
-# are using the BROADCOM SAI. Note that during the build the directory seems to
-# be opx-nas-ndi-x870-1 rather than opx-nas-ndi-x870.
-AM_CONDITIONAL([USING_BROADCOM_SAI], [test ${ac_abs_confdir%x870*} != ${ac_abs_confdir}])
+# If this directory ends in "x870" define the automake variable USING_BROADCOM_SAI so that the
+# the sources can be compiled knowing that they are using the BROADCOM SAI.
+AM_CONDITIONAL([USING_BROADCOM_SAI], [test ${abs_srcdir%x870} != ${abs_srcdir}])
 
 AC_CONFIG_FILES([Makefile inc/Makefile])
 AC_OUTPUT
