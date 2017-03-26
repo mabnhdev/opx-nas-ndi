@@ -171,8 +171,10 @@ t_std_error ndi_qos_create_map(npu_id_t npu_id,
     uint_t attr_count = 1;  // map-type only
     sai_attribute_t attr_list[2];
 
+#ifdef ORIGINAL_DELL_CODE
     if (map_entry_count > 0)
         attr_count = 2; // Plus map-list
+#endif
 
     try {
 
@@ -185,6 +187,20 @@ t_std_error ndi_qos_create_map(npu_id_t npu_id,
                     "Unexpected error.\n", npu_id);
         return STD_ERR(QOS, CFG, 0);
     }
+
+#ifndef ORIGINAL_DELL_CODE
+    /*
+     * Extreme addition - The Broadcom SAI needs to see the
+     * SAI_QOS_MAP_ATTR_MAP_TO_VALUE_LIST attribute even if there are
+     * no map entries. If not supplied the map doesn't get created.
+     */
+    std::vector<sai_qos_map_t> entry_list(map_entry_count);
+    attr_count = 2; // Plus map-list
+    attr_list[1].id = SAI_QOS_MAP_ATTR_MAP_TO_VALUE_LIST;
+    _fill_sai_request_map_entries(&entry_list[0], map_entry_count, map_entry);
+    attr_list[1].value.qosmap.count = map_entry_count;
+    attr_list[1].value.qosmap.list = &entry_list[0];
+#endif
 
     nas_ndi_db_t *ndi_db_ptr = ndi_db_ptr_get(npu_id);
     if (ndi_db_ptr == NULL) {
